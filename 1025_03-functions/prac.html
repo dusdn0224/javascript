@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		// 1. 함수
+		// 자바스크립트에서는 두 가지 방식으로 선언이 가능
+
+		// 1. 1. 함수 선언식 - 호이스팅 O
+		// 이때까지 쓴 방식과 비슷한 방식
+		func('호이스팅', '된다구')
+		function func (param1, param2) {
+			console.log(`함수 선언식 = ${param1}, ${param2}`)
+		}
+		func(1, 2)
+
+		// 1. 2. 함수 표현식 - 호이스팅 X
+		// 함수의 이름은 일반적으로 잘 안 쓴다 (익명 함수로)
+		// But, 재귀 호출 때는 이름이 필요
+		const myfunc = function (param1, param2) {
+			console.log(`함수 표현식 = ${param1}, ${param2}`)
+		}
+		myfunc(3, 4)
+
+		// 1. 3. 매개변수의 기본값 설정
+		const myfunc2 = function (param1=100, param2=200) {
+			console.log(`${param1}, ${param2}`)
+		}
+		myfunc2()
+		myfunc2(5)
+		myfunc2(5, 6)
+		myfunc2(5, 6, 7, 8)
+
+		// 1. 4. 모든 매개변수 활용하기
+		const myfunc3 = function (param1=100, param2=200) {
+			// arguments: 파라미터 전체를 가지는 내장 객체 - 자주 안 씀
+			// 1. 화살표 함수, Array Helper Methods에서 못 씀
+			// 2. 가독성 안 좋음
+			console.log(arguments)
+		}
+		myfunc3(5, 6, 7, 8)
+		// 많이 쓰이는 방법
+		const myfunc4 = function (param1, param2, ...params) {
+			console.log(params) // 인덱스 접근 가능, typeof: object
+		}
+		myfunc4(5, 6, 7, 8)
+
+		// 1. 5. 객체를 파라미터로 보내보자!
+		const obj = {
+			'name': '이연우',
+			'job': '학생',
+			'condition': 'wow',
+			callMyName () {
+				console.log(`내 이름은 ${this.name}`)
+			}
+		}
+		const myfunc5 = function (obj) {
+			console.log(obj)
+			// 객체 속성 접근은 .이나 [] 활용
+			console.log(obj.name)
+			console.log(obj['job'])
+			obj.callMyName()
+		}
+		myfunc5(obj)
+
+		// 1. 6. 화살표 함수
+		const notArrowFunc = function () {
+			return 10
+		}
+		// 일반적으로 많이 쓰는 방식
+		const arrowFunc1 = () => {
+			return 10
+		}
+		// 내부 표현식이 return을 포함한 한 줄
+		const arrowFunc2 = () => 10
+		// 파라미터가 없을 때 언더바(_)로 사용
+		const arrowFunc3 = _ => 10
+
+		// 1. 7. this 알아보기
+		// this: 특정 Object를 가리키는 키워드
+		// python의 self와 비슷함(인스턴스 자기 자신)
+		// javascript는 호출 위치에 따라
+		// this가 가리키는 Object가 바뀜
+		// -> 호출될 때 결정 됨(동적 할당)
+
+		// 1. 7. 1. 냅다 써보기
+		console.log(this) // 전역 객체 Window가 출력
+
+		// 1. 7. 2. 일반 함수에서 this
+		const normalFunc = function () {
+			console.log(this) // 전역 객체 Window
+		}
+		normalFunc()
+
+		// 1. 7. 3. 객체 내부 메서드에서의 this
+		const obj2 = {
+			name: 'test',
+			myFunc: function () {
+				console.log(this) // 메서드가 정의된 객체
+			}
+		}
+		obj2.myFunc()
+
+		// 1. 7. 4. 화살표 함수에서의 this
+		const arrowFunc_this = () => {
+			console.log(this) // 전역 객체 Window
+		}
+		arrowFunc_this()
+
+		const obj3 = {
+			name: 'test',
+			// 화살표 함수에서 this는
+			// 정의한 곳 기준으로 한 단계 상위 스코프의 this를 참조
+			// 이러한 것을 렉시컬 스코프(Lexical Scope)라고 함
+			myFunc: () => {
+				console.log(this) // 전역 객체 Window
+			}
+		}
+		obj3.myFunc()
+
+		// 1. 7. 5. 생성자 함수 내부에서 this
+		function Person (name) {
+			this.name = name
+			this.greeting = function () {
+				// this: 생성된 인스턴스
+				console.log(`${this.name}씨 환영합니다!`)
+			}
+		}
+		const person1 = new Person('이연우')
+		const person2 = new Person('김우연')
+		person1.greeting()
+		person2.greeting()
+
+		// 1. 7. 6. 중첩된 함수에서의 this
+		const myObj = {
+      numbers: [1, 2, 3],
+      plusNumber: 3,
+      myFunc() {
+        console.log("this", this)   // myObj
+        // forEach 내부의 콜백 함수로 사용된 익명 함수는
+        // 밖으로 분리할 수 있다.
+        // == 일반 함수에서 this 참조와 동일함 == Window
+        // this.numbers.forEach(innerFunc)
+
+        // 콜백 함수는 화살표로 쓰자!
+        this.numbers.forEach((element) => {
+          console.log(element + this.plusNumber)
+        })
+      }
+    }
+
+    myObj.myFunc()
+
+		// 1. 8. 함수 스코프와 블록 스코프의 차이
+		// 둘 모두 외부에서 접근 불가능한 범위를 나타냄
+
+		// 함수 스코프 테스트
+		function abc() {
+			var varTmp = 12
+			let letTmp = 13
+			const constTmp = 14
+		}
+		// 함수 스코프 내부의 변수를 참조할 수 없어서 에러
+		// var, let, const 모두 에러
+		// console.log(varTmp)
+
+		// 블록 스코프 테스트
+		if (true) {
+			var varTmp = 12
+			let letTmp = 13
+			const constTmp = 14
+		}
+		// var는 된다
+		console.log(varTmp)
+		// var는 함수 스코프에서만 지역 변수로 인식
+		// 블록 스코프에서는 전역 변수로 인식
+
+		// 3. 1. Array Helper Methods
+		// 가독성이 높아짐, 내부적으로 for문보다 빠르게 동작
+		// 많이 쓰이는 7가지 배열 함수
+		const numbers = [1, 2, 3, 4, 5]
+		
+		// 3. 1. 1. forEach
+		// 원본 배열을 건들지 않고, 내부 요소들에 접근하고 싶을 때
+		// element: 배열의 각 요소
+		// index: 배열 요소의 인덱스
+		// array: 원본 배열
+		numbers.forEach((element, index, array) => {
+			console.log(element)
+		})
+
+		// 3. 1. 2. map
+		// 원본 배열을 기반으로 새로운 배열을 만들고 싶을 때
+		const newNumbers = numbers.map((element) => {
+			return element + 5
+		})
+		console.log(numbers) // 원본 배열은 그대로
+		console.log(newNumbers) // 5가 더해진 새로운 배열
+
+		// 3. 1. 3. filter
+		// 원본 배열에서 필요한 데이터만 골라서 새로운 배열로 생성
+		// 예시) 배열 중 짝수만 사용하고 싶다
+		const filterNumbers = numbers.filter((element) => {
+			// 조건이 true인 요소만 반환
+			return element % 2 === 0
+		})
+		console.log(filterNumbers)
+
+		// 3. 1. 4. reduce
+		// 원본 배열 데이터를 활용해서 특정 하나의 값을 얻고 싶을 때
+		// 예시) 합계 -> total: 누적값
+		// initialValue: 초기값
+		let initialValue = 0
+		const sumValue = numbers.reduce((total, element, index, array) => {
+			return total += element
+		}, initialValue) // initialValue는 그냥 숫자 써도 됨
+		console.log(sumValue)
+
+		// Quiz. 초기값을 10으로 설정하여, numbers 배열 중 짝수만 더해라
+		const evenplus = numbers.reduce((total, element) => {
+			if (element % 2 === 0) {
+				return total += element
+			}
+			return total
+		}, 10)
+		console.log(evenplus)
+
+		// 3. 1. 5. find
+		// 배열에서 특정 값을 찾아서 반환, 못찾으면 undefined 반환
+		let target = 3
+		const findNumber = numbers.find((element) => {
+			// 조건이 true인 순간 검색 끝
+			return element === target
+		})
+		console.log(findNumber)
+
+		// 3. 1. 6. some
+		// 특정 조건이 하나라도 맞으면 true, 모두 틀리면 false
+		const someNumber = numbers.some((element) => {
+			// 2보다 작은게 하나라도 있으면 true
+			return element < 2
+		})
+		console.log(someNumber)
+
+		// 3. 1. 7. every
+		// 특정 조건이 모두 만족하면 true, 하나라도 틀리면 false
+		const everyFlag = numbers.every((element) => {
+			return element < 5
+		})
+		console.log(everyFlag)
+
+		// 아래 두 개만 확실히 가져가자!
+    // object 에서는 화살표 함수를 쓰지말자!
+    const tmpObj = {
+      name: "test",
+      myFunc() {
+        console.log(this.name)
+      }
+    }
+
+    // 콜백 함수에서는 화살표 함수를 쓰자!
+    numbers.forEach((element) => {
+      console.log(element)
+    })
+	</script>
+</body>
+</html>
